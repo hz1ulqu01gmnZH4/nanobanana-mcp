@@ -188,7 +188,7 @@ npm run dev
 
 ## License
 
-MIT
+WTFPL - Do What The Fuck You Want To Public License
 
 ## Credits
 
