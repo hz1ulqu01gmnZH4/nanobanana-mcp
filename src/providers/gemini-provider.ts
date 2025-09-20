@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { Jimp } from 'jimp';
 import { ImageProvider, ImageGenerationArgs, GenerationResult, ImageInput } from '../types.js';
 import { parseAspectRatio, generateBlankImageSync, getAspectRatioPrompt } from '../utils/aspect-ratio.js';
+import { readImageFileAsBase64 } from '../utils.js';
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent';
 
@@ -38,6 +39,15 @@ export class GeminiProvider implements ImageProvider {
               inline_data: {
                 mime_type: image.mimeType || 'image/png',
                 data: image.base64.replace(/^data:.*?;base64,/, '')
+              }
+            });
+          } else if (image.path) {
+            // Read local file and convert to base64
+            const imageData = await readImageFileAsBase64(image.path);
+            parts.push({
+              inline_data: {
+                mime_type: image.mimeType || imageData.mimeType,
+                data: imageData.base64
               }
             });
           } else if (image.url) {

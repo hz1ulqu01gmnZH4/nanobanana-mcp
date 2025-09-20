@@ -1,6 +1,7 @@
 export interface ImageInput {
   url?: string;
   base64?: string;
+  path?: string;  // Local file path to image
   mimeType?: string;
   description?: string;
 }

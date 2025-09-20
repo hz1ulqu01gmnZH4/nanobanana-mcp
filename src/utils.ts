@@ -2,6 +2,46 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import fetch from 'node-fetch';
 
+/**
+ * Read an image file from disk and convert to base64
+ */
+export async function readImageFileAsBase64(filePath: string): Promise<{ base64: string; mimeType: string }> {
+  try {
+    // Read file buffer
+    const buffer = await fs.readFile(filePath);
+
+    // Convert to base64
+    const base64 = buffer.toString('base64');
+
+    // Determine MIME type from extension
+    const ext = path.extname(filePath).toLowerCase().slice(1);
+    let mimeType = 'image/png'; // default
+
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        mimeType = 'image/jpeg';
+        break;
+      case 'png':
+        mimeType = 'image/png';
+        break;
+      case 'gif':
+        mimeType = 'image/gif';
+        break;
+      case 'webp':
+        mimeType = 'image/webp';
+        break;
+      case 'bmp':
+        mimeType = 'image/bmp';
+        break;
+    }
+
+    return { base64, mimeType };
+  } catch (error: any) {
+    throw new Error(`Failed to read image file ${filePath}: ${error.message}`);
+  }
+}
+
 export async function saveImages(images: any[], baseFilename: string): Promise<string[]> {
   const savedFiles: string[] = [];
   // For MCP servers, files should be saved relative to where the client is running

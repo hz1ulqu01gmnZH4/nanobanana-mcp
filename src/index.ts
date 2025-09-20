@@ -51,10 +51,14 @@ class NanoBananaMCPServer {
               },
               images: {
                 type: 'array',
-                description: 'Reference images for image-to-image generation or style transfer',
+                description: 'Reference images for image-to-image generation or style transfer. Supports URLs, file paths, or base64 data.',
                 items: {
                   type: 'object',
                   properties: {
+                    path: {
+                      type: 'string',
+                      description: 'Local file path to the reference image (e.g., ./images/photo.jpg)',
+                    },
                     url: {
                       type: 'string',
                       description: 'URL of the reference image',

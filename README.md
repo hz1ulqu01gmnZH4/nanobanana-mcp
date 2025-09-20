@@ -83,6 +83,25 @@ Add to your Claude Desktop configuration file:
 2. Sign up or log in
 3. Generate an API key from your dashboard
 
+## Reference Image Options
+
+The MCP server supports three ways to provide reference images:
+
+1. **File Paths**: Load images from local files
+   ```javascript
+   images: [{ path: "./my-image.jpg" }]
+   ```
+
+2. **URLs**: Load images from the web
+   ```javascript
+   images: [{ url: "https://example.com/image.jpg" }]
+   ```
+
+3. **Base64**: Provide pre-encoded image data
+   ```javascript
+   images: [{ base64: "iVBORw0KGgo...", mimeType: "image/png" }]
+   ```
+
 ## Usage Examples
 
 ### Basic Text-to-Image
@@ -93,11 +112,25 @@ generate_image({
 ```
 
 ### Style Transfer with Reference Image
+
+Using a URL:
 ```javascript
 generate_image({
   prompt: "Apply this artistic style to a photo of a mountain",
   images: [{
     url: "https://example.com/style-reference.jpg"
+  }],
+  scenario: "style-transfer"
+})
+```
+
+Using a local file:
+```javascript
+generate_image({
+  prompt: "Apply this artistic style to a photo of a mountain",
+  images: [{
+    path: "./images/style-reference.jpg",
+    description: "Artistic style reference"
   }],
   scenario: "style-transfer"
 })
@@ -113,12 +146,15 @@ generate_image({
 ```
 
 ### Multi-Reference Combination
+
+You can mix different input types (URLs, file paths, and base64):
 ```javascript
 generate_image({
   prompt: "Combine the clothing style from the first image with the pose from the second",
   images: [
-    { url: "https://example.com/clothing.jpg" },
-    { url: "https://example.com/pose.jpg" }
+    { path: "./references/clothing.jpg" },
+    { url: "https://example.com/pose.jpg" },
+    { base64: "iVBORw0KGgo...", mimeType: "image/png" }
   ],
   scenario: "multi-reference"
 })

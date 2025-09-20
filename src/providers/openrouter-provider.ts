@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { Jimp } from 'jimp';
 import { ImageProvider, ImageGenerationArgs, GenerationResult, ImageInput } from '../types.js';
 import { parseAspectRatio, generateBlankImageSync, getAspectRatioPrompt } from '../utils/aspect-ratio.js';
+import { readImageFileAsBase64 } from '../utils.js';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const GEMINI_MODEL = 'google/gemini-2.5-flash-image-preview';
@@ -38,15 +39,23 @@ export class OpenRouterProvider implements ImageProvider {
       // Add reference images if provided
       if (args.images && args.images.length > 0) {
         for (const image of args.images) {
-          if (image.base64 || image.url) {
-            const imageUrl = image.base64 
-              ? `data:${image.mimeType || 'image/png'};base64,${image.base64.replace(/^data:.*?;base64,/, '')}`
-              : image.url;
-            
+          let imageUrl: string | undefined;
+
+          if (image.base64) {
+            imageUrl = `data:${image.mimeType || 'image/png'};base64,${image.base64.replace(/^data:.*?;base64,/, '')}`;
+          } else if (image.path) {
+            // Read local file and convert to base64 data URL
+            const imageData = await readImageFileAsBase64(image.path);
+            imageUrl = `data:${image.mimeType || imageData.mimeType};base64,${imageData.base64}`;
+          } else if (image.url) {
+            imageUrl = image.url;
+          }
+
+          if (imageUrl) {
             content.push({
               type: 'image_url',
               image_url: {
-                url: imageUrl!
+                url: imageUrl
               }
             });
           }
